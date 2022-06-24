@@ -1,82 +1,93 @@
 <template>
-   <div class="container">
+  <div class="container">
     <h1>Digite aqui seu artigo:</h1>
-    <input type="text" placeholder="Titulo" v-model="title"><br>
-    <textarea v-model="content"  placeholder="Conteúdo do post..."></textarea><br>
+    <input type="text" placeholder="Titulo" v-model="title" /><br />
+    <textarea v-model="content" placeholder="Conteúdo do post..."></textarea
+    ><br />
     <button @click="addTask">Postar</button>
   </div>
-  <table >
-    <thead><h1> Posts recentes:</h1></thead>
+  <table>
+    <thead>
+      <h1>Posts recentes:</h1>
+    </thead>
     <tbody>
-      <tr  v-for="artigo in artigos" v-bind:key="artigo.id">
+      <tr v-for="artigo in artigos" v-bind:key="artigo.id">
         <td>
           <h3>{{ artigo.title }}</h3>
           <p>{{ artigo.content }}</p>
-          <hr>
+          <hr />
         </td>
-        <td  @click="removeTask(artigo.id)"><p class="close">X</p></td>
+        <td @click="removeTask(artigo.id)"><p class="close">X</p></td>
       </tr>
-
     </tbody>
   </table>
 </template>
 <script>
-import axios from 'axios';
+import axios from "axios";
 
 export default {
-  name: 'App',
+  name: "App",
   data() {
     return {
       artigos: null,
-      title: '',
-      content: ''
-    }
+      title: "",
+      content: "",
+    };
   },
   methods: {
-    addTask() {
-      this.artigos.push(
-        {
-          id: this.artigos.id,
-          title: this.title,
-          content: this.content
-        }
-      )
-      this.title = "",
-        this.content = ""
+    async addTask() {
+      
+      await axios
+        .post("http://localhost:3333/posts", {
+          "title": this.title,
+          "content": this.content,
+        })
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+
+        this.artigos.push({
+        id: this.artigos.id,
+        title: this.title,
+        content: this.content,
+      });
+      (this.title = ""), (this.content = "");
     },
-    removeTask(id) {
-      for (var i = this.artigos.length; i--;) {
+    async removeTask(id) {
+      for (var i = this.artigos.length; i--; ) {
         if (this.artigos[i].id === id) {
+          await axios.delete("http://localhost:3333/posts/" + id);
           this.artigos.splice(i, 1);
         }
       }
-    }
+    },
   },
-  mounted(){
-    axios.get("http://localhost:3333/posts")
-    .then(response => (
-      this.artigos = response.data
-    ));
-  }
-
-}
+  mounted() {
+    axios
+      .get("http://localhost:3333/posts")
+      .then((response) => (this.artigos = response.data));
+  },
+};
 </script>
 <style>
-textarea{
+textarea {
   height: 70px;
   width: 370px;
 }
-table{
+table {
   border-spacing: 10px 10px;
 }
-tr{
+tr {
   padding: 8px;
 }
 body {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   margin: 20px;
 }
-.close{
+.close {
   color: brown;
 }
 </style>
