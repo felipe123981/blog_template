@@ -29,7 +29,7 @@ export default {
   name: "App",
   data() {
     return {
-      artigos: null,
+      artigos: [],
       title: "",
       content: "",
     };
@@ -37,6 +37,12 @@ export default {
   methods: {
     async addTask() {
       
+      this.artigos.push({
+        id: this.artigos.id,
+        title: this.title,
+        content: this.content,
+      });
+
       await axios
         .post("http://localhost:3333/posts", {
           "title": this.title,
@@ -48,19 +54,13 @@ export default {
         .catch(function (error) {
           console.log(error);
         });
-
-        this.artigos.push({
-        id: this.artigos.id,
-        title: this.title,
-        content: this.content,
-      });
       (this.title = ""), (this.content = "");
     },
     async removeTask(id) {
       for (var i = this.artigos.length; i--; ) {
         if (this.artigos[i].id === id) {
-          await axios.delete("http://localhost:3333/posts/" + id);
           this.artigos.splice(i, 1);
+          await axios.delete("http://localhost:3333/posts/" + id);
         }
       }
     },
